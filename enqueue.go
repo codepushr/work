@@ -64,46 +64,27 @@ func (e *Enqueuer) Enqueue(jobName string, args map[string]interface{}) (*Job, e
 	return job, nil
 }
 
-// EnqueueChain will enqueue the specified jobs in a chain one-by-one fashion.
-// Example: e.EnqueueChain(work.C{"job1": work.Q{"arg": "foo"}, "job2": work.Q{"arg": "bar"}})
-func (e *Enqueuer) EnqueueChain(jobs C) (*Job, error) {
-	var jobList []*Job
+// EnqueueJob will enqueue the specified job. Only the EnqueuedAt property will be set before serialization.
+func (e *Enqueuer) EnqueueJob(job Job) error {
+	job.EnqueuedAt = nowEpochSeconds()
 
-	for _, v := range jobs {
-		for i, j := range v {
-			job := &Job{
-				Name:       i,
-				ID:         makeIdentifier(),
-				EnqueuedAt: nowEpochSeconds(),
-				Args:       j,
-			}
-			jobList = append(jobList, job)
-		}
-	}
-
-	for i := len(jobList) - 1; i > 0; i-- {
-		if i > 0 {
-			jobList[i-1].OnSuccess = jobList[i]
-		}
-	}
-
-	rawJSON, err := jobList[0].serialize()
+	rawJSON, err := job.serialize()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	conn := e.Pool.Get()
 	defer conn.Close()
 
-	if _, err := conn.Do("LPUSH", e.queuePrefix+jobList[0].Name, rawJSON); err != nil {
-		return nil, err
+	if _, err := conn.Do("LPUSH", e.queuePrefix+job.Name, rawJSON); err != nil {
+		return err
 	}
 
-	if err := e.addToKnownJobs(conn, jobList[0].Name); err != nil {
-		return jobList[0], err
+	if err := e.addToKnownJobs(conn, job.Name); err != nil {
+		return err
 	}
 
-	return jobList[0], nil
+	return nil
 }
 
 // EnqueueIn enqueues a job in the scheduled job queue for execution in secondsFromNow seconds.

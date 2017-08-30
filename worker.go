@@ -181,14 +181,26 @@ func (w *worker) fetchJob() (*Job, error) {
 		return nil, err
 	}
 
-	// In case of job chain add next job saved in OnSuccess to queue.
 	if job.OnSuccess != nil {
-		rawJSON, err = json.Marshal(job.OnSuccess)
-		if err != nil {
-			return nil, err
+		for _, v := range job.OnSuccess {
+			rawJSON, err = json.Marshal(v)
+			if err != nil {
+				return nil, err
+			}
+			if _, err := conn.Do("LPUSH", redisKeyJobsPrefix(w.namespace)+v.Name, rawJSON); err != nil {
+				return nil, err
+			}
 		}
-		if _, err := conn.Do("LPUSH", redisKeyJobsPrefix(w.namespace)+job.OnSuccess.Name, rawJSON); err != nil {
-			return nil, err
+	}
+	if job.OnError != nil {
+		for _, v := range job.OnError {
+			rawJSON, err = json.Marshal(v)
+			if err != nil {
+				return nil, err
+			}
+			if _, err := conn.Do("LPUSH", redisKeyJobsPrefix(w.namespace)+v.Name, rawJSON); err != nil {
+				return nil, err
+			}
 		}
 	}
 

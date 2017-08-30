@@ -27,7 +27,8 @@ type Job struct {
 	argError     error
 	observer     *observer
 
-	OnSuccess *Job `json:"on_success,omitempy"`
+	OnSuccess []Job `json:"on_success,omitempy"`
+	OnError   []Job `json:"on_error,omitempy"`
 }
 
 // Q is a shortcut to easily specify arguments for jobs when enqueueing them.
