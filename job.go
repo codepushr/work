@@ -14,6 +14,7 @@ type Job struct {
 	ID         string                 `json:"id"`
 	EnqueuedAt int64                  `json:"t"`
 	Args       map[string]interface{} `json:"args"`
+	Vars       map[string]interface{} `json:"vars"`
 	Unique     bool                   `json:"unique,omitempty"`
 
 	// Inputs when retrying
