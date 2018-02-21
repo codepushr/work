@@ -17,6 +17,8 @@ type Job struct {
 	Vars       map[string]interface{} `json:"vars"`
 	Unique     bool                   `json:"unique,omitempty"`
 
+	Priority int64 `json:"priority,omitempty"`
+
 	// Inputs when retrying
 	Fails    int64  `json:"fails,omitempty"` // number of times this job has failed
 	LastErr  string `json:"err,omitempty"`
