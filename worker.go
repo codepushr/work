@@ -1,7 +1,6 @@
 package work
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/rand"
 	"reflect"
@@ -179,29 +178,6 @@ func (w *worker) fetchJob() (*Job, error) {
 	job, err := newJob(rawJSON, dequeuedFrom, inProgQueue)
 	if err != nil {
 		return nil, err
-	}
-
-	if job.OnSuccess != nil {
-		for _, v := range job.OnSuccess {
-			rawJSON, err = json.Marshal(v)
-			if err != nil {
-				return nil, err
-			}
-			if _, err := conn.Do("LPUSH", redisKeyJobsPrefix(w.namespace)+v.Name, rawJSON); err != nil {
-				return nil, err
-			}
-		}
-	}
-	if job.OnError != nil {
-		for _, v := range job.OnError {
-			rawJSON, err = json.Marshal(v)
-			if err != nil {
-				return nil, err
-			}
-			if _, err := conn.Do("LPUSH", redisKeyJobsPrefix(w.namespace)+v.Name, rawJSON); err != nil {
-				return nil, err
-			}
-		}
 	}
 
 	return job, nil
