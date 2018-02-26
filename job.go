@@ -34,6 +34,8 @@ type Job struct {
 
 	OnSuccess []Job `json:"on_success,omitempy"`
 	OnError   []Job `json:"on_error,omitempy"`
+
+	Result map[string]interface{} `json:"result,omitempty"`
 }
 
 // Q is a shortcut to easily specify arguments for jobs when enqueueing them.
