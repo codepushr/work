@@ -9,17 +9,17 @@ import (
 
 // Job represents a job.
 type Job struct {
-	TaskID string `json:"taskId"`
-
 	// Inputs when making a new job
-	Name       string                 `json:"name,omitempty"`
-	ID         string                 `json:"id"`
-	EnqueuedAt int64                  `json:"t"`
-	Args       map[string]interface{} `json:"args"`
-	Vars       map[string]interface{} `json:"vars"`
-	Unique     bool                   `json:"unique,omitempty"`
+	Name       string `json:"name,omitempty"`
+	ID         string `json:"id"`
+	EnqueuedAt int64  `json:"t"`
+	Unique     bool   `json:"unique,omitempty"`
 
-	Priority int64 `json:"priority,omitempty"`
+	// Custom #1
+	TaskID   string                 `json:"taskId"`
+	Priority int64                  `json:"priority,omitempty"`
+	Args     map[string]interface{} `json:"args"`
+	Vars     map[string]interface{} `json:"vars"`
 
 	// Inputs when retrying
 	Fails    int64  `json:"fails,omitempty"` // number of times this job has failed
@@ -32,10 +32,9 @@ type Job struct {
 	argError     error
 	observer     *observer
 
+	// Custom #2
 	OnSuccess []Job `json:"on_success,omitempy"`
 	OnError   []Job `json:"on_error,omitempy"`
-
-	Result map[string]interface{} `json:"result,omitempty"`
 }
 
 // Q is a shortcut to easily specify arguments for jobs when enqueueing them.
